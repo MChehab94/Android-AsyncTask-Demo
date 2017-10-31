@@ -13,7 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AsyncListener{
 
     private TextView textView;
     private final String URL = "http://validate.jsontest.com/?json=%7B%22key%22:%22value%22%7D";
@@ -27,40 +27,12 @@ public class MainActivity extends AppCompatActivity {
         Button button = findViewById(R.id.button);
 
         button.setOnClickListener(e -> {
-            new GetJSON().execute(URL);
+            new GetJSON(this).execute(URL);
         });
     }
 
-    class GetJSON extends AsyncTask<String, Integer, String> {
-
-        @Override
-        protected String doInBackground(String... strings) {
-            try {
-                URL url = new URL(strings[0]);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setRequestMethod("GET");
-                httpURLConnection.connect();
-
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader
-                        (httpURLConnection.getInputStream()));
-                StringBuilder result = new StringBuilder();
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    result.append(line);
-                }
-                return result.toString();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            textView.setText(result);
-        }
+    @Override
+    public void getResult(String result) {
+        textView.setText(result);
     }
 }
