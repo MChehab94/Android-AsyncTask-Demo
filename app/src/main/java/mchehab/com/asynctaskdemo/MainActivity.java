@@ -15,6 +15,7 @@ public class MainActivity extends AppCompatActivity implements AsyncListener, As
     private ImageView imageView;
     private ProgressBar progressBar;
     private final String URL = "http://validate.jsontest.com/?json=%7B%22key%22:%22value%22%7D";
+    private final String IMAGE_URL = "https://www.w3schools.com/bootstrap/paris.jpg";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements AsyncListener, As
         });
         buttonImage.setOnClickListener(e -> {
             progressBar.setVisibility(View.VISIBLE);
-            new AsyncImageDownloader(this).execute("https://www.w3schools.com/bootstrap/paris.jpg");
+            new AsyncImageDownloader(this).execute(IMAGE_URL);
         });
     }
 
