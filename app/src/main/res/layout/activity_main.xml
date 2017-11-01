@@ -6,6 +6,21 @@
     android:layout_height="match_parent"
     tools:context="mchehab.com.asynctaskdemo.MainActivity">
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="8dp"
+        android:visibility="gone"/>
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:layout_centerHorizontal="true"/>
+
     <Button
         android:id="@+id/button"
         android:layout_width="match_parent"
@@ -14,10 +29,18 @@
         android:layout_alignParentBottom="true"
         android:text="Get JSON"/>
 
+    <Button
+        android:id="@+id/buttonImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:layout_above="@id/button"
+        android:text="Get Image"/>
+
     <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/imageView"
         android:layout_above="@id/button">
 
         <TextView
