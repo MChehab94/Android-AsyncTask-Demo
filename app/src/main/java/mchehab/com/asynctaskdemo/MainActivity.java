@@ -109,21 +109,7 @@ public class MainActivity extends AppCompatActivity{
         progressBar = findViewById(R.id.progressBar);
 
         if(savedInstanceState != null){
-            imageDirectory = savedInstanceState.getString(SaveInstanceConstants.MAIN_ACTIVITY_IMAGE);
-            if(imageDirectory != null){
-                Bitmap bitmap;
-                try {
-                    bitmap = BitmapFactory.decodeStream(new FileInputStream(imageDirectory));
-                    imageView.setImageBitmap(bitmap);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-            textView.setText(savedInstanceState.getString(SaveInstanceConstants.MAIN_ACTIVITY_TEXT));
-
-            if(savedInstanceState.getBoolean(SaveInstanceConstants.MAIN_ACTIVITY_ASYNC_JSON)){
-                progressBar.setVisibility(View.VISIBLE);
-            }
+            handleSavedInstanceState(savedInstanceState);
         }
 
         Button button = findViewById(R.id.button);
@@ -135,6 +121,24 @@ public class MainActivity extends AppCompatActivity{
         buttonImage.setOnClickListener(e -> {
             executeAsyncImageDownloader();
         });
+    }
+
+    private void handleSavedInstanceState(Bundle savedInstanceState){
+        imageDirectory = savedInstanceState.getString(SaveInstanceConstants.MAIN_ACTIVITY_IMAGE);
+        if(imageDirectory != null){
+            Bitmap bitmap;
+            try {
+                bitmap = BitmapFactory.decodeStream(new FileInputStream(imageDirectory));
+                imageView.setImageBitmap(bitmap);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        textView.setText(savedInstanceState.getString(SaveInstanceConstants.MAIN_ACTIVITY_TEXT));
+
+        if(savedInstanceState.getBoolean(SaveInstanceConstants.MAIN_ACTIVITY_ASYNC_JSON)){
+            progressBar.setVisibility(View.VISIBLE);
+        }
     }
 
     private void executeGetJSON(){
