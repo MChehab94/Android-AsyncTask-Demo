@@ -67,9 +67,9 @@ public class MainActivity extends AppCompatActivity{
     protected void onResume(){
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new
-                IntentFilter("json"));
+                IntentFilter(BroadcastConstants.JSON));
         LocalBroadcastManager.getInstance(this).registerReceiver(imageBroadcastReceiver, new
-                IntentFilter("image"));
+                IntentFilter(BroadcastConstants.IMAGE));
     }
 
     @Override
@@ -84,17 +84,17 @@ public class MainActivity extends AppCompatActivity{
         String text = textView.getText().toString();
         if(asyncImageDownloader != null && asyncImageDownloader.getStatus() == AsyncTask.Status
                 .RUNNING){
-            outState.putBoolean("asyncImageDownloader", true);
+            outState.putBoolean(SaveInstanceConstants.MAIN_ACTIVITY_ASYNC_JSON, true);
         }
         if(imageView.getDrawable() != null){
             //save to internal storage
             BitmapDrawable bitmapDrawable = (BitmapDrawable)imageView.getDrawable();
             Bitmap bitmap = bitmapDrawable.getBitmap();
             imageDirectory = Util.saveToInternalStorage("image", bitmap, getApplicationContext());
-            outState.putString("image", imageDirectory);
+            outState.putString(SaveInstanceConstants.MAIN_ACTIVITY_IMAGE, imageDirectory);
         }
 
-        outState.putString("text", text);
+        outState.putString(SaveInstanceConstants.MAIN_ACTIVITY_TEXT, text);
 
         super.onSaveInstanceState(outState);
     }
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity{
         progressBar = findViewById(R.id.progressBar);
 
         if(savedInstanceState != null){
-            imageDirectory = savedInstanceState.getString("image");
+            imageDirectory = savedInstanceState.getString(SaveInstanceConstants.MAIN_ACTIVITY_IMAGE);
             if(imageDirectory != null){
                 Bitmap bitmap;
                 try {
@@ -119,9 +119,9 @@ public class MainActivity extends AppCompatActivity{
                     e.printStackTrace();
                 }
             }
-            textView.setText(savedInstanceState.getString("text"));
+            textView.setText(savedInstanceState.getString(SaveInstanceConstants.MAIN_ACTIVITY_TEXT));
 
-            if(savedInstanceState.getBoolean("asyncImageDownloader")){
+            if(savedInstanceState.getBoolean(SaveInstanceConstants.MAIN_ACTIVITY_ASYNC_JSON)){
                 progressBar.setVisibility(View.VISIBLE);
             }
         }
@@ -138,14 +138,15 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void executeGetJSON(){
-        getJSON = new GetJSON(new WeakReference<>(getApplicationContext()));
+        getJSON = new GetJSON(new WeakReference<>(getApplicationContext()), BroadcastConstants.IMAGE);
         getJSON.execute(URL);
     }
 
     private void executeAsyncImageDownloader(){
         imageView.setImageBitmap(null);
         progressBar.setVisibility(View.VISIBLE);
-        asyncImageDownloader = new AsyncImageDownloader(new WeakReference<>(getApplicationContext()));
+        asyncImageDownloader = new AsyncImageDownloader(new WeakReference<>(getApplicationContext
+                ()), BroadcastConstants.IMAGE);
         asyncImageDownloader.execute(IMAGE_URL);
     }
 }
