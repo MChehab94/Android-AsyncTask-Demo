@@ -1,10 +1,14 @@
 package mchehab.com.asynctaskdemo;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.content.LocalBroadcastManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -15,10 +19,10 @@ import java.net.URL;
 
 public class GetJSON extends AsyncTask<String, Integer, String> {
 
-    private AsyncListener asyncListener;
+    private WeakReference<Context> applicationContext;
 
-    public GetJSON(AsyncListener asyncListener){
-        this.asyncListener = asyncListener;
+    public GetJSON(WeakReference<Context> context){
+        this.applicationContext = context;
     }
 
     @Override
@@ -48,6 +52,8 @@ public class GetJSON extends AsyncTask<String, Integer, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        asyncListener.getResult(result);
+        Intent intent = new Intent("json");
+        intent.putExtra("result", result);
+        LocalBroadcastManager.getInstance(applicationContext.get()).sendBroadcast(intent);
     }
 }
