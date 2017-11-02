@@ -20,9 +20,11 @@ import java.net.URL;
 public class GetJSON extends AsyncTask<String, Integer, String> {
 
     private WeakReference<Context> applicationContext;
+    private String broadcastIntent;
 
-    public GetJSON(WeakReference<Context> context){
+    public GetJSON(WeakReference<Context> context, String broadcastIntent){
         this.applicationContext = context;
+        this.broadcastIntent = broadcastIntent;
     }
 
     @Override
@@ -52,7 +54,7 @@ public class GetJSON extends AsyncTask<String, Integer, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        Intent intent = new Intent("json");
+        Intent intent = new Intent(broadcastIntent);
         intent.putExtra("result", result);
         LocalBroadcastManager.getInstance(applicationContext.get()).sendBroadcast(intent);
     }

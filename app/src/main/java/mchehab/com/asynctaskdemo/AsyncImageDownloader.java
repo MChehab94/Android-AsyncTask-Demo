@@ -20,9 +20,11 @@ import java.net.URL;
 public class AsyncImageDownloader extends AsyncTask<String, Integer, Bitmap>{
 
     private WeakReference<Context> applicationContext;
+    private String broadcastIntent;
 
-    public AsyncImageDownloader(WeakReference<Context> context){
+    public AsyncImageDownloader(WeakReference<Context> context, String broadcastIntent){
         this.applicationContext = context;
+        this.broadcastIntent = broadcastIntent;
     }
 
     @Override
@@ -44,7 +46,7 @@ public class AsyncImageDownloader extends AsyncTask<String, Integer, Bitmap>{
 
     @Override
     protected void onPostExecute(Bitmap bitmap){
-        Intent intent = new Intent("image");
+        Intent intent = new Intent(broadcastIntent);
         intent.putExtra("image", Util.saveToInternalStorage("image", bitmap, applicationContext
                         .get()));
         LocalBroadcastManager.getInstance(applicationContext.get()).sendBroadcast(intent);
