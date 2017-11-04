@@ -1,5 +1,6 @@
 package mchehab.com.asynctaskdemo;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,23 +11,22 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.lang.ref.WeakReference;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends BaseNetworkActivity{
 
     private TextView textView;
     private ImageView imageView;
     private ProgressBar progressBar;
+
     private final String URL = "http://validate.jsontest.com/?json=%7B%22key%22:%22value%22%7D";
     private final String IMAGE_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/LARGE_elevation" +
             ".jpg/800px-LARGE_elevation.jpg";
@@ -34,6 +34,11 @@ public class MainActivity extends AppCompatActivity{
     private GetJSON getJSON;
     private AsyncImageDownloader asyncImageDownloader;
     private String imageDirectory;
+
+    private AlertDialog alertDialogNoInternet;
+
+    private boolean isImageDownloading = false;
+    private boolean isJSONDownloading = false;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -104,6 +109,13 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        alertDialogNoInternet = new AlertDialog
+                .Builder(this)
+                .setTitle("No Internet Connection")
+                .setMessage("Please make sure you have a valid internet connection")
+                .setPositiveButton("Ok", null)
+                .create();
+
         textView = findViewById(R.id.textView);
         imageView = findViewById(R.id.imageView);
         progressBar = findViewById(R.id.progressBar);
@@ -142,15 +154,47 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void executeGetJSON(){
-        getJSON = new GetJSON(new WeakReference<>(getApplicationContext()), BroadcastConstants.IMAGE);
-        getJSON.execute(URL);
+        isJSONDownloading = true;
+        if(hasInternetConnection()){
+            getJSON = new GetJSON(new WeakReference<>(getApplicationContext()), BroadcastConstants.IMAGE);
+            getJSON.execute(URL);
+        }else{
+            displayNoInternetDialog();
+        }
     }
 
     private void executeAsyncImageDownloader(){
-        imageView.setImageBitmap(null);
-        progressBar.setVisibility(View.VISIBLE);
-        asyncImageDownloader = new AsyncImageDownloader(new WeakReference<>(getApplicationContext
-                ()), BroadcastConstants.IMAGE);
-        asyncImageDownloader.execute(IMAGE_URL);
+        isImageDownloading = true;
+        if(hasInternetConnection()){
+            imageView.setImageBitmap(null);
+            progressBar.setVisibility(View.VISIBLE);
+            asyncImageDownloader = new AsyncImageDownloader(new WeakReference<>(getApplicationContext
+                    ()), BroadcastConstants.IMAGE);
+            asyncImageDownloader.execute(IMAGE_URL);
+        }else{
+            displayNoInternetDialog();
+        }
+    }
+
+    private void displayNoInternetDialog(){
+        alertDialogNoInternet.show();
+    }
+
+    @Override
+    void noInternetConnection() {
+        displayNoInternetDialog();
+    }
+
+    @Override
+    void internetConnectionAvailable() {
+        if(alertDialogNoInternet.isShowing()){
+            alertDialogNoInternet.dismiss();
+        }
+        if(isImageDownloading){
+            executeAsyncImageDownloader();
+        }
+        if(isJSONDownloading){
+            executeGetJSON();
+        }
     }
 }
