@@ -47,6 +47,7 @@ public class MainActivity extends BaseNetworkActivity{
             if(bundle != null){
                 String result = bundle.getString("result");
                 textView.setText(result);
+                isJSONDownloading = false;
             }
         }
     };
@@ -61,6 +62,7 @@ public class MainActivity extends BaseNetworkActivity{
                 try {
                     bitmap = BitmapFactory.decodeStream(new FileInputStream(imageDirectory));
                     imageView.setImageBitmap(bitmap);
+                    isImageDownloading = false;
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
