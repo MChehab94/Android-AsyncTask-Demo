@@ -12,7 +12,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -126,13 +125,10 @@ public class MainActivity extends BaseNetworkActivity{
             handleSavedInstanceState(savedInstanceState);
         }
 
-        Button button = findViewById(R.id.button);
-        Button buttonImage = findViewById(R.id.buttonImage);
-
-        button.setOnClickListener(e -> {
+        findViewById(R.id.button).setOnClickListener(e -> {
             executeGetJSON();
         });
-        buttonImage.setOnClickListener(e -> {
+        findViewById(R.id.buttonImage).setOnClickListener(e -> {
             executeAsyncImageDownloader();
         });
     }
