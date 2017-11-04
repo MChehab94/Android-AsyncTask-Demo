@@ -46,9 +46,11 @@ public class AsyncImageDownloader extends AsyncTask<String, Integer, Bitmap>{
 
     @Override
     protected void onPostExecute(Bitmap bitmap){
-        Intent intent = new Intent(broadcastIntent);
-        intent.putExtra("image", Util.saveToInternalStorage("image", bitmap, applicationContext
-                        .get()));
-        LocalBroadcastManager.getInstance(applicationContext.get()).sendBroadcast(intent);
+        if(bitmap != null){
+            Intent intent = new Intent(broadcastIntent);
+            intent.putExtra("image", Util.saveToInternalStorage("image", bitmap, applicationContext
+                    .get()));
+            LocalBroadcastManager.getInstance(applicationContext.get()).sendBroadcast(intent);
+        }
     }
 }
