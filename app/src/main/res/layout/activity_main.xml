@@ -30,11 +30,18 @@
         android:text="Get JSON"/>
 
     <Button
+        android:id="@+id/buttonPost"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/button"
+        android:text="Post JSON"/>
+
+    <Button
         android:id="@+id/buttonImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:layout_above="@id/button"
+        android:layout_above="@id/buttonPost"
         android:text="Get Image"/>
 
     <ScrollView
