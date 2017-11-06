@@ -16,6 +16,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.lang.ref.WeakReference;
@@ -38,6 +41,7 @@ public class MainActivity extends BaseNetworkActivity{
 
     private boolean isImageDownloading = false;
     private boolean isJSONDownloading = false;
+    private boolean isJSONPosting = false;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -47,6 +51,18 @@ public class MainActivity extends BaseNetworkActivity{
                 String result = bundle.getString("result");
                 textView.setText(result);
                 isJSONDownloading = false;
+            }
+        }
+    };
+
+    private BroadcastReceiver broadcastReceiverPost = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getExtras();
+            if(bundle != null){
+                String result = bundle.getString("json");
+                textView.setText(result);
+                isJSONPosting = false;
             }
         }
     };
@@ -76,6 +92,8 @@ public class MainActivity extends BaseNetworkActivity{
                 IntentFilter(BroadcastConstants.JSON));
         LocalBroadcastManager.getInstance(this).registerReceiver(imageBroadcastReceiver, new
                 IntentFilter(BroadcastConstants.IMAGE));
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiverPost, new
+                IntentFilter(BroadcastConstants.JSON_POST));
     }
 
     @Override
@@ -83,6 +101,7 @@ public class MainActivity extends BaseNetworkActivity{
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(imageBroadcastReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiverPost);
     }
 
     @Override
@@ -128,6 +147,9 @@ public class MainActivity extends BaseNetworkActivity{
         findViewById(R.id.button).setOnClickListener(e -> {
             executeGetJSON();
         });
+        findViewById(R.id.buttonPost).setOnClickListener(e -> {
+            executePostJSON();
+        });
         findViewById(R.id.buttonImage).setOnClickListener(e -> {
             executeAsyncImageDownloader();
         });
@@ -156,6 +178,29 @@ public class MainActivity extends BaseNetworkActivity{
         if(hasInternetConnection()){
             getJSON = new GetJSON(new WeakReference<>(getApplicationContext()), BroadcastConstants.IMAGE);
             getJSON.execute(URL);
+        }else{
+            displayNoInternetDialog();
+        }
+    }
+
+    private void executePostJSON(){
+        isJSONPosting = true;
+        if(hasInternetConnection()){
+            try{
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("comments", "just deliver");
+                jsonObject.put("custemail", "myemail");
+                jsonObject.put("size", "medium");
+
+                JSONObject jsonObjectForm = new JSONObject();
+                jsonObjectForm.put("form", jsonObject);
+
+                new AsyncTaskPost(new WeakReference<Context>(this), jsonObjectForm.toString(),
+                        BroadcastConstants.JSON_POST).execute("https://httpbin.org/post");
+
+            }catch (JSONException jsonException){
+                jsonException.printStackTrace();
+            }
         }else{
             displayNoInternetDialog();
         }
@@ -193,6 +238,9 @@ public class MainActivity extends BaseNetworkActivity{
         }
         if(isJSONDownloading){
             executeGetJSON();
+        }
+        if(isJSONPosting){
+            executePostJSON();
         }
     }
 }
