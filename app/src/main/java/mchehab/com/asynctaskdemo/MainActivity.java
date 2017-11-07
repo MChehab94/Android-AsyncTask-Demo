@@ -182,7 +182,7 @@ public class MainActivity extends BaseNetworkActivity{
                 jsonObjectForm.put("form", jsonObject);
 
                 getJSON = new HttpAsyncTask(new WeakReference<Context>(this), BroadcastConstants.JSON,
-                        "POST", jsonObject.toString());
+                        HTTP.POST, jsonObject.toString());
                 getJSON.execute("https://httpbin.org/post");
             }catch (JSONException jsonException){
                 jsonException.printStackTrace();

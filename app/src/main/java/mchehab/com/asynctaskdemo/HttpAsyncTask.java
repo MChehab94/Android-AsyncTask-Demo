@@ -23,7 +23,7 @@ public class HttpAsyncTask extends AsyncTask<String, Integer, String> {
 
     private WeakReference<Context> applicationContext;
     private String broadcastIntent;
-    private String httpRequestType = "GET";//default value
+    private String httpRequestType = HTTP.GET;//default value
     private String dataToPost;
 
     private void init(WeakReference<Context> context, String broadcastIntent){
@@ -50,7 +50,7 @@ public class HttpAsyncTask extends AsyncTask<String, Integer, String> {
             httpURLConnection.setRequestMethod(httpRequestType);
             httpURLConnection.connect();
 
-            if(httpRequestType.equals("POST")){
+            if(httpRequestType.equals(HTTP.POST)){
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(httpURLConnection
                         .getOutputStream()));
                 writer.write(dataToPost);
