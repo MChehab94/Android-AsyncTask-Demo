@@ -6,8 +6,10 @@ import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -21,10 +23,23 @@ public class GetJSON extends AsyncTask<String, Integer, String> {
 
     private WeakReference<Context> applicationContext;
     private String broadcastIntent;
+    private String httpRequestType = "GET";//default value
+    private String dataToPost;
 
-    public GetJSON(WeakReference<Context> context, String broadcastIntent){
+    private void init(WeakReference<Context> context, String broadcastIntent){
         this.applicationContext = context;
         this.broadcastIntent = broadcastIntent;
+    }
+
+    public GetJSON(WeakReference<Context> context, String broadcastIntent){
+        init(context, broadcastIntent);
+    }
+
+    public GetJSON(WeakReference<Context> context, String broadcastIntent, String
+            httpRequestType, String dataToPost){
+        init(context, broadcastIntent);
+        this.httpRequestType = httpRequestType;
+        this.dataToPost = dataToPost;
     }
 
     @Override
@@ -32,8 +47,15 @@ public class GetJSON extends AsyncTask<String, Integer, String> {
         try {
             URL url = new URL(strings[0]);
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-            httpURLConnection.setRequestMethod("GET");
+            httpURLConnection.setRequestMethod(httpRequestType);
             httpURLConnection.connect();
+
+            if(httpRequestType.equals("POST")){
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(httpURLConnection
+                        .getOutputStream()));
+                writer.write(dataToPost);
+                writer.flush();
+            }
 
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader
                     (httpURLConnection.getInputStream()));
