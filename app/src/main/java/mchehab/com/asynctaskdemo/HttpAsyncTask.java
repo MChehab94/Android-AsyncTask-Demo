@@ -19,7 +19,7 @@ import java.net.URL;
  * Created by muhammadchehab on 10/31/17.
  */
 
-public class GetJSON extends AsyncTask<String, Integer, String> {
+public class HttpAsyncTask extends AsyncTask<String, Integer, String> {
 
     private WeakReference<Context> applicationContext;
     private String broadcastIntent;
@@ -31,11 +31,11 @@ public class GetJSON extends AsyncTask<String, Integer, String> {
         this.broadcastIntent = broadcastIntent;
     }
 
-    public GetJSON(WeakReference<Context> context, String broadcastIntent){
+    public HttpAsyncTask(WeakReference<Context> context, String broadcastIntent){
         init(context, broadcastIntent);
     }
 
-    public GetJSON(WeakReference<Context> context, String broadcastIntent, String
+    public HttpAsyncTask(WeakReference<Context> context, String broadcastIntent, String
             httpRequestType, String dataToPost){
         init(context, broadcastIntent);
         this.httpRequestType = httpRequestType;
