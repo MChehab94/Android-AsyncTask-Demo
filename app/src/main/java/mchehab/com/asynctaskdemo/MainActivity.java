@@ -50,7 +50,12 @@ public class MainActivity extends BaseNetworkActivity{
             if(bundle != null){
                 textView.setText(bundle.getString("result"));
             }
-            isJSONDownloading = false;
+            if(isJSONPosting){
+                isJSONPosting = false;
+            }
+            if(isJSONDownloading){
+                isJSONDownloading = false;
+            }
         }
     };
 
