@@ -33,7 +33,7 @@ public class MainActivity extends BaseNetworkActivity{
     private final String IMAGE_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/LARGE_elevation" +
             ".jpg/800px-LARGE_elevation.jpg";
 
-    private GetJSON getJSON;
+    private HttpAsyncTask getJSON;
     private AsyncImageDownloader asyncImageDownloader;
     private String imageDirectory;
 
@@ -48,22 +48,9 @@ public class MainActivity extends BaseNetworkActivity{
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getExtras();
             if(bundle != null){
-                String result = bundle.getString("result");
-                textView.setText(result);
-                isJSONDownloading = false;
+                textView.setText(bundle.getString("result"));
             }
-        }
-    };
-
-    private BroadcastReceiver broadcastReceiverPost = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Bundle bundle = intent.getExtras();
-            if(bundle != null){
-                String result = bundle.getString("json");
-                textView.setText(result);
-                isJSONPosting = false;
-            }
+            isJSONDownloading = false;
         }
     };
 
@@ -85,23 +72,27 @@ public class MainActivity extends BaseNetworkActivity{
         }
     };
 
+    private void registerBroadcast(BroadcastReceiver broadcastReceiver, IntentFilter intentFilter){
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+    private void unregisterBroadcasts(BroadcastReceiver...broadcastReceivers){
+        for(BroadcastReceiver broadcastReceiver : broadcastReceivers){
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        }
+    }
+
     @Override
     protected void onResume(){
         super.onResume();
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new
-                IntentFilter(BroadcastConstants.JSON));
-        LocalBroadcastManager.getInstance(this).registerReceiver(imageBroadcastReceiver, new
-                IntentFilter(BroadcastConstants.IMAGE));
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiverPost, new
-                IntentFilter(BroadcastConstants.JSON_POST));
+        registerBroadcast(broadcastReceiver, new IntentFilter(BroadcastConstants.JSON));
+        registerBroadcast(imageBroadcastReceiver, new IntentFilter(BroadcastConstants.IMAGE));
     }
 
     @Override
     protected void onPause(){
         super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(imageBroadcastReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiverPost);
+        unregisterBroadcasts(broadcastReceiver, imageBroadcastReceiver);
     }
 
     @Override
@@ -144,15 +135,9 @@ public class MainActivity extends BaseNetworkActivity{
             handleSavedInstanceState(savedInstanceState);
         }
 
-        findViewById(R.id.button).setOnClickListener(e -> {
-            executeGetJSON();
-        });
-        findViewById(R.id.buttonPost).setOnClickListener(e -> {
-            executePostJSON();
-        });
-        findViewById(R.id.buttonImage).setOnClickListener(e -> {
-            executeAsyncImageDownloader();
-        });
+        findViewById(R.id.button).setOnClickListener(e -> executeGetJSON());
+        findViewById(R.id.buttonPost).setOnClickListener(e -> executePostJSON());
+        findViewById(R.id.buttonImage).setOnClickListener(e -> executeAsyncImageDownloader());
     }
 
     private void handleSavedInstanceState(Bundle savedInstanceState){
@@ -176,7 +161,8 @@ public class MainActivity extends BaseNetworkActivity{
     private void executeGetJSON(){
         isJSONDownloading = true;
         if(hasInternetConnection()){
-            getJSON = new GetJSON(new WeakReference<>(getApplicationContext()), BroadcastConstants.IMAGE);
+            getJSON = new HttpAsyncTask(new WeakReference<>(getApplicationContext()),
+                    BroadcastConstants.JSON);
             getJSON.execute(URL);
         }else{
             displayNoInternetDialog();
@@ -195,9 +181,9 @@ public class MainActivity extends BaseNetworkActivity{
                 JSONObject jsonObjectForm = new JSONObject();
                 jsonObjectForm.put("form", jsonObject);
 
-                new AsyncTaskPost(new WeakReference<Context>(this), jsonObjectForm.toString(),
-                        BroadcastConstants.JSON_POST).execute("https://httpbin.org/post");
-
+                getJSON = new HttpAsyncTask(new WeakReference<Context>(this), BroadcastConstants.JSON,
+                        "POST", jsonObject.toString());
+                getJSON.execute("https://httpbin.org/post");
             }catch (JSONException jsonException){
                 jsonException.printStackTrace();
             }
